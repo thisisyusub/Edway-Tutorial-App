@@ -11,14 +11,15 @@ class AuthChangeNotifier extends ChangeNotifier {
     inProgress = true;
     notifyListeners();
 
-    await Future.delayed(Duration(seconds: 3));
     final authDataSource = AuthDataSource();
 
     final result = await authDataSource.signIn(username, password);
 
+    final resultInNotNull = result != null;
+
     inProgress = false;
-    isSuccess = result; // false
-    isFailure = !result; // true
+    isSuccess = resultInNotNull; // false
+    isFailure = !resultInNotNull; // true
 
     notifyListeners();
   }

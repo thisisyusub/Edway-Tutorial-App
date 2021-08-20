@@ -1,8 +1,11 @@
-import '../models/login_body.dart';
+import 'package:dio/dio.dart';
+
+import '../models/requests/login_body.dart';
+import '../models/responses/login_response.dart';
 import 'dio_configuration.dart';
 
 class AuthDataSource {
-  Future<bool> signIn(String username, String password) async {
+  Future<LoginResponse?> signIn(String username, String password) async {
     try {
       final loginBody = LoginBody(
         clientId: 'org.edway.webclient',
@@ -12,17 +15,28 @@ class AuthDataSource {
         password: password,
       ).toJson();
 
-      final result = await dio.post('/connect/token', data: loginBody);
+      final result = await dio.post(
+        '/connect/token',
+        options: Options(
+          contentType: "application/x-www-form-urlencoded",
+        ),
+        data: loginBody,
+      );
+
+      print(result);
 
       if (result.statusCode != null) {
         if (result.statusCode! >= 200 && result.statusCode! <= 299) {
-          return true;
+          final loginResponse = LoginResponse.fromJson(result.data);
+          print(loginResponse);
+
+          return LoginResponse.fromJson(result.data);
         }
       }
     } catch (e, s) {
       print('$e => $s');
     }
 
-    return false;
+    return null;
   }
 }
