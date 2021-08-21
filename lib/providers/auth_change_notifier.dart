@@ -1,26 +1,36 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
 
-import '../data/data_sources/auth_data_source.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+enum AuthState { initial, authenticated, unauthenticated }
 
 class AuthChangeNotifier extends ChangeNotifier {
-  bool inProgress = false;
-  bool isFailure = false;
-  bool isSuccess = false;
+  final _authStreamController = StreamController<AuthState>()
+    ..add(AuthState.initial);
 
-  void login(String username, String password) async {
-    inProgress = true;
-    notifyListeners();
+  Stream<AuthState> get authStream => _authStreamController.stream;
 
-    final authDataSource = AuthDataSource();
+  void checkAuth() async {
+    try {
+      await Future.delayed(Duration(seconds: 3));
+      final sharedPrefs = await SharedPreferences.getInstance();
+      final authenticated = sharedPrefs.getBool('logged');
 
-    final result = await authDataSource.signIn(username, password);
+      if (authenticated != null && authenticated) {
+        _authStreamController.add(AuthState.authenticated);
+      } else {
+        _authStreamController.add(AuthState.unauthenticated);
+      }
+    } catch (e, s) {
+      print('$e => $s');
+      _authStreamController.add(AuthState.unauthenticated);
+    }
+  }
 
-    final resultInNotNull = result != null;
-
-    inProgress = false;
-    isSuccess = resultInNotNull; // false
-    isFailure = !resultInNotNull; // true
-
-    notifyListeners();
+  @override
+  void dispose() {
+    _authStreamController.close();
+    super.dispose();
   }
 }

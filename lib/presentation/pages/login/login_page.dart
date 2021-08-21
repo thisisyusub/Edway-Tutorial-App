@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../providers/auth_change_notifier.dart';
+import '../../../providers/login_change_notifier.dart';
 import '../../global/custom_action_button.dart';
 
 class LoginPage extends StatefulWidget {
@@ -20,10 +20,10 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
 
-    final authNotifier = context.read<AuthChangeNotifier>();
+    final loginNotifier = context.read<LoginChangeNotifier>();
 
-    authNotifier.addListener(() {
-      if (authNotifier.isFailure) {
+    loginNotifier.addListener(() {
+      if (loginNotifier.isFailure) {
         showDialog(
           context: context,
           builder: (context) {
@@ -33,6 +33,9 @@ class _LoginPageState extends State<LoginPage> {
             );
           },
         );
+      } else if (loginNotifier.isSuccess) {
+        print('successful!');
+        Navigator.of(context).pushReplacementNamed('/home');
       }
     });
   }
@@ -77,9 +80,9 @@ class _LoginPageState extends State<LoginPage> {
               ],
             ),
             SizedBox(height: 20),
-            Consumer<AuthChangeNotifier>(
-              builder: (context, authNotifier, child) {
-                if (authNotifier.inProgress) {
+            Consumer<LoginChangeNotifier>(
+              builder: (context, loginNotifier, child) {
+                if (loginNotifier.inProgress) {
                   return CircularProgressIndicator();
                 }
 
@@ -88,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                   color: Theme.of(context).primaryColor,
                   textColor: Colors.white,
                   onTap: () {
-                    context.read<AuthChangeNotifier>().login(
+                    context.read<LoginChangeNotifier>().login(
                           username.text,
                           password.text,
                         );
