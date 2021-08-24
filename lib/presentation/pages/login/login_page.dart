@@ -55,6 +55,13 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Image.asset(
+              'assets/images/login.png',
+              fit: BoxFit.cover,
+            ),
+            SizedBox(
+              height: 30,
+            ),
             TextField(
               controller: username,
               decoration: decoration.copyWith(
