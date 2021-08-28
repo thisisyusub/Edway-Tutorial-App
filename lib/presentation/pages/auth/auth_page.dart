@@ -17,12 +17,15 @@ class AuthPage extends StatelessWidget {
       body: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
           if (state == AuthState.initial) {
-            return SizedBox();
+            return AuthLoading();
           } else if (state == AuthState.authenticated) {
             return HomePage();
           } else {
             return Provider<SignInBloc>(
               create: (context) => SignInBloc(),
+              dispose: (context, signInBloc) {
+                signInBloc.dispose();
+              },
               child: LoginPage(),
             );
           }

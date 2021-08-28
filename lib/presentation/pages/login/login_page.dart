@@ -97,10 +97,4 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
-  @override
-  void dispose() {
-    Provider.of<SignInBloc>(context).dispose();
-    super.dispose();
-  }
 }

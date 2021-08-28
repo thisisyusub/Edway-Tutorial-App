@@ -11,7 +11,8 @@ class AuthBloc extends Cubit<AuthState> {
 
   void checkAuth() async {
     final result = await authRepository.checkAuth();
-    print('result: $result');
+
+    await Future.delayed(Duration(seconds: 2));
 
     if (result.isSuccess()) {
       final isAuthenticated = result.getSuccess()!;

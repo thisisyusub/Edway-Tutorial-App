@@ -12,6 +12,7 @@ class AuthLoading extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text('Checking Auth...'),
+          const SizedBox(height: 20),
           CircularProgressIndicator(),
         ],
       ),
