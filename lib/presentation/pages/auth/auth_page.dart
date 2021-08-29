@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
-import '../../../providers/auth_change_notifier.dart';
-import '../../../providers/login_change_notifier.dart';
+import '../../../blocs/auth/auth_bloc.dart';
+import '../../../blocs/sign_in/sign_in_bloc.dart';
 import '../home/home_page.dart';
 import '../login/login_page.dart';
 import 'widgets/auth_loading.dart';
@@ -13,23 +14,21 @@ class AuthPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: StreamBuilder<AuthState>(
-        stream: context.read<AuthChangeNotifier>().authStream,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            if (snapshot.data == AuthState.authenticated) {
-              return HomePage();
-            } else if (snapshot.data == AuthState.unauthenticated) {
-              return ChangeNotifierProvider<LoginChangeNotifier>(
-                create: (context) => LoginChangeNotifier(),
-                child: LoginPage(),
-              );
-            } else {
-              return AuthLoading();
-            }
+      body: BlocBuilder<AuthBloc, AuthState>(
+        builder: (context, state) {
+          if (state == AuthState.initial) {
+            return AuthLoading();
+          } else if (state == AuthState.authenticated) {
+            return HomePage();
+          } else {
+            return Provider<SignInBloc>(
+              create: (context) => SignInBloc(),
+              dispose: (context, signInBloc) {
+                signInBloc.dispose();
+              },
+              child: LoginPage(),
+            );
           }
-
-          return AuthLoading();
         },
       ),
     );
