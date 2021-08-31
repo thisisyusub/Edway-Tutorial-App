@@ -1,10 +1,13 @@
-import 'package:edway_tutorial_app/blocs/sign_in/sign_in_event.dart';
-import 'package:edway_tutorial_app/blocs/sign_in/sign_in_state.dart';
-import 'package:edway_tutorial_app/presentation/global/custom_action_button.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../blocs/sign_in/sign_in_bloc.dart';
+import '../../global/custom_action_button.dart';
+import '../../dialogs/failure/failure_dialog.dart';
+
+/// BlocBuilder
+/// BlocListener
+/// BlocConsumer (BlocBuilder + BlocListener)
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key? key}) : super(key: key);
@@ -18,20 +21,7 @@ class _LoginPageState extends State<LoginPage> {
   final password = TextEditingController();
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    Provider.of<SignInBloc>(context).signInState.listen((event) {
-      if (event is SignInSuccess) {
-        Navigator.pushReplacementNamed(context, '/home');
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final signInBloc = Provider.of<SignInBloc>(context);
-
     final decoration = InputDecoration(
       border: OutlineInputBorder(),
     );
@@ -42,64 +32,89 @@ class _LoginPageState extends State<LoginPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/images/login.png',
-              fit: BoxFit.cover,
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            TextField(
-              controller: username,
-              decoration: decoration.copyWith(
-                hintText: 'Username',
-              ),
-            ),
-            SizedBox(height: 20),
-            TextField(
-              controller: password,
-              decoration: decoration.copyWith(
-                hintText: 'Password',
-              ),
-              obscureText: true,
-            ),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Text('Keep me signed in'),
-                Checkbox(
-                  value: true,
-                  onChanged: (value) {},
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            StreamBuilder<SignInState>(
-                stream: signInBloc.signInState,
-                builder: (context, stateSnapshot) {
-                  if (stateSnapshot.hasData &&
-                      stateSnapshot.data is SignInInProgress) {
-                    return CircularProgressIndicator();
-                  }
+        child: BlocConsumer<SignInBloc, SignInState>(
+          buildWhen: (_, current) => current is! SignInSuccess,
+          listenWhen: (_, current) =>
+              current is SignInFailure || current is SignInSuccess,
+          listener: (context, state) {
+            if (state is SignInFailure) {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return FailureDialog(message: state.message);
+                  });
+            } else if (state is SignInSuccess) {
+              Navigator.pushReplacementNamed(context, '/home');
+            }
+          },
+          builder: (context, state) {
+            String? usernameError;
+            String? passwordError;
 
-                  return CustomActionButton(
+            if (state is SignInEmptyFieldCase) {
+              usernameError = state.emptyFields.contains(EmptyFields.username)
+                  ? 'useraname cannot be empty!'
+                  : null;
+
+              passwordError = state.emptyFields.contains(EmptyFields.password)
+                  ? 'password cannot be empty!'
+                  : null;
+            }
+
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/images/login.png',
+                  fit: BoxFit.cover,
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+                TextField(
+                  controller: username,
+                  decoration: decoration.copyWith(
+                    hintText: 'Username',
+                    errorText: usernameError,
+                  ),
+                ),
+                SizedBox(height: 20),
+                TextField(
+                  controller: password,
+                  decoration: decoration.copyWith(
+                    hintText: 'Password',
+                    errorText: passwordError,
+                  ),
+                  obscureText: true,
+                ),
+                SizedBox(height: 10),
+                Row(
+                  children: [
+                    Text('Keep me signed in'),
+                    Checkbox(
+                      value: true,
+                      onChanged: (value) {},
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                if (state is! SignInInProgress)
+                  CustomActionButton(
                     title: 'Log in',
                     color: Theme.of(context).primaryColor,
                     textColor: Colors.white,
                     onTap: () {
-                      signInBloc.inputController.add(
-                        LoginPressed(
-                          username: username.text,
-                          password: password.text,
-                        ),
-                      );
+                      context.read<SignInBloc>().add(LoginPressed(
+                            username: username.text,
+                            password: password.text,
+                          ));
                     },
-                  );
-                }),
-          ],
+                  )
+                else
+                  CircularProgressIndicator(),
+              ],
+            );
+          },
         ),
       ),
     );

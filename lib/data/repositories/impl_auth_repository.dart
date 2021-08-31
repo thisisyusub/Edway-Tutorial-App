@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:multiple_result/multiple_result.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../locator.dart';
 import '../contractors/i_auth_repository.dart';
@@ -14,7 +15,6 @@ class ImplAuthRepository implements IAuthRepository {
   Future<Result<CheckAuthFailure, bool>> checkAuth() async {
     try {
       final isAuthenticated = await _authDataSource.isAuthenticated();
-      print('isAuthenticated: $isAuthenticated');
       return Success(isAuthenticated ?? false);
     } catch (e) {
       return Error(CheckAuthFailure());
@@ -28,6 +28,8 @@ class ImplAuthRepository implements IAuthRepository {
   ) async {
     try {
       final result = await _authDataSource.signIn(username, password);
+      final sharedPrefs = await SharedPreferences.getInstance();
+      sharedPrefs.setBool('logged', true);
       return Success(result);
     } on DioError catch (e) {
       return Error(SignInFailure(e.message));

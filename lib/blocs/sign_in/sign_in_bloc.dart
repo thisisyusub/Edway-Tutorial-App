@@ -1,52 +1,51 @@
 import 'dart:async';
 
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../data/data_sources/auth_data_source.dart';
-import 'sign_in_event.dart';
-import 'sign_in_state.dart';
+import '../../data/contractors/i_auth_repository.dart';
 
-class SignInBloc {
-  SignInBloc() {
-    _outputController.add(SignInInitial());
+part 'sign_in_state.dart';
+part 'sign_in_event.dart';
 
-    inputController.stream.listen((event) {
-      if (event is LoginPressed) {
-        _signIn(event.username, event.password);
+class SignInBloc extends Bloc<SignInEvent, SignInState> {
+  SignInBloc(this.authRepository) : super(SignInInitial());
+
+  final IAuthRepository authRepository;
+
+  @override
+  Stream<SignInState> mapEventToState(SignInEvent event) async* {
+    if (event is LoginPressed) {
+      final usernameEmpty = event.username.trim().isEmpty;
+      final passwordEmpty = event.password.trim().isEmpty;
+
+      if (usernameEmpty || passwordEmpty) {
+        var emptyFields = <EmptyFields>[];
+
+        emptyFields.addAll(
+          [
+            if (usernameEmpty) EmptyFields.username,
+            if (passwordEmpty) EmptyFields.password,
+          ],
+        );
+
+        yield SignInEmptyFieldCase(emptyFields);
+        return;
       }
-    });
-  }
 
-  final inputController = StreamController<SignInEvent>();
-  final _outputController = StreamController<SignInState>.broadcast();
+      yield SignInInProgress();
 
-  Stream<SignInState> get signInState => _outputController.stream;
+      final result = await authRepository.signIn(
+        event.username,
+        event.password,
+      );
 
-  void _signIn(String username, String password) async {
-    try {
-      _outputController.add(SignInInProgress());
-
-      await Future.delayed(Duration(seconds: 3));
-
-      final authDataSource = AuthDataSource();
-
-      final result = await authDataSource.signIn(username, password);
-
-      if (result != null) {
-        final sharedPrefs = await SharedPreferences.getInstance();
-        sharedPrefs.setBool('logged', true);
-
-        _outputController.add(SignInSuccess());
-      } else {
-        _outputController.add(SignInFailure('Data is null!'));
+      if (result.isSuccess()) {
+        yield SignInSuccess();
+      } else if (result.isError()) {
+        final error = result.getError();
+        yield SignInFailure(error!.message);
       }
-    } catch (e) {
-      _outputController.add(SignInFailure(e.toString()));
     }
-  }
-
-  void dispose() {
-    inputController.close();
-    _outputController.close();
   }
 }
