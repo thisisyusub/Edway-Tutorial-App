@@ -18,7 +18,7 @@ class AuthDataSource {
       password: password,
     ).toJson();
 
-    final result = await dio.post(
+    final result = await identityDio.post(
       '/connect/token',
       options: Options(
         contentType: "application/x-www-form-urlencoded",

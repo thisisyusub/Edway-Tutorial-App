@@ -30,8 +30,10 @@ class ImplAuthRepository implements IAuthRepository {
       final result = await _authDataSource.signIn(username, password);
       final sharedPrefs = await SharedPreferences.getInstance();
       sharedPrefs.setBool('logged', true);
+      sharedPrefs.setString('accessToken', result.accessToken);
       return Success(result);
-    } on DioError catch (e) {
+    } on DioError catch (e, s) {
+      print('$e => $s');
       return Error(SignInFailure(e.message));
     } catch (e) {
       return Error(SignInFailure(e.toString()));
