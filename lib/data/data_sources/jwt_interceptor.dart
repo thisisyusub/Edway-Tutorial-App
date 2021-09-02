@@ -1,10 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// get - Interceptor - request - response
+
 class JwtInterceptor extends Interceptor {
   @override
   void onRequest(
-      RequestOptions options, RequestInterceptorHandler handler) async {
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     final sharedPrefs = await SharedPreferences.getInstance();
     final accessToken = sharedPrefs.getString('accessToken');
 

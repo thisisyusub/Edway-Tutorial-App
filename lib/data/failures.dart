@@ -5,3 +5,5 @@ class SignInFailure {
 }
 
 class CheckAuthFailure {}
+
+class Failure {}
