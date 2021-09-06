@@ -7,3 +7,5 @@ class SignInFailure {
 class CheckAuthFailure {}
 
 class Failure {}
+
+class LocalizationFailure {}

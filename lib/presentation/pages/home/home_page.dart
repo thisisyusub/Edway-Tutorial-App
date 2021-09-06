@@ -1,18 +1,34 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../../../data/data_sources/dio_configuration.dart';
 import '../../../blocs/paths/paths_bloc.dart';
+import '../select_language/select_language_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home Page'),
+        title: Text(localizations.homePage),
+        actions: [
+          IconButton(
+            onPressed: () {
+              // todo: change to named router
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) {
+                  return SelectLangaugePage();
+                }),
+              );
+            },
+            icon: Icon(Icons.settings),
+          ),
+        ],
       ),
       body: BlocBuilder<PathsCubit, PathsState>(
         builder: (context, state) {
@@ -40,7 +56,7 @@ class HomePage extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        child: Text('Add'),
+        child: Text(localizations.add),
         onPressed: () async {},
       ),
     );

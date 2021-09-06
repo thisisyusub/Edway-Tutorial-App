@@ -26,6 +26,8 @@ dependency_overrides:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   dio: ^4.0.0
   shared_preferences: ^2.0.7
   flutter_bloc: ^7.2.0 # provider ^6.0.0
@@ -33,6 +35,7 @@ dependencies:
   multiple_result: ^1.0.4
   json_serializable: ^5.0.0
   retrofit: ^2.0.1
+  hive_flutter: ^1.1.0
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -48,6 +51,8 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
+  generate: true
+
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
