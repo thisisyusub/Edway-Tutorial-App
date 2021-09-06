@@ -35,7 +35,7 @@ class HomePage extends StatelessWidget {
           if (state is PathsInProgress) {
             return Center(child: CupertinoActivityIndicator());
           } else if (state is PathsFailure) {
-            return Center(child: Text('Failure!'));
+            return Center(child: Text(localizations.failure));
           } else if (state is PathsSuccess) {
             final paths = state.paths;
 

@@ -2,5 +2,8 @@
   "@@locale": "en",
   "homePage": "Home Page",
   "add": "Add",
-  "logIn": "Log in"
+  "logIn": "Log in",
+  "failure": "Failure!",
+   "selectLangauge": "Select Langauge"
+
 }

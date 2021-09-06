@@ -2,5 +2,7 @@
   "@@locale": "ru",
   "homePage": "Домашняя страница",
   "add": "Добавлять",
-  "logIn": "Войти"
+  "logIn": "Войти",
+   "failure": "Неудача!",
+   "selectLangauge": "Выбрать язык"
 }
