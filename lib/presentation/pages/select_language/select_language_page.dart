@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../blocs/localization/localization_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SelectLangaugePage extends StatelessWidget {
   const SelectLangaugePage({Key? key}) : super(key: key);
@@ -9,10 +10,11 @@ class SelectLangaugePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final localizationBloc = context.watch<LocalizationCubit>();
     final currentLangCode = localizationBloc.state;
+    final localizations = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Select Langauge'),
+        title: Text(localizations.selectLangauge),
       ),
       body: Column(
         children: [
